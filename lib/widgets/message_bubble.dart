@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:chat_app/models/message.dart';
-import 'package:chat_app/main.dart'; // For supabase client
+import 'package:chat_app/main.dart'; 
 
 class MessageBubble extends StatelessWidget {
   final Message message;

@@ -1,7 +1,8 @@
+//screens/chat_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:chat_app/main.dart'; // For supabase client
+import 'package:chat_app/main.dart'; 
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/screens/auth_screen.dart';
 import 'package:chat_app/widgets/message_bubble.dart';
@@ -16,7 +17,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late final Stream<List<Message>> _messagesStream;
   final _messageController = TextEditingController();
-  final Map<String, String> _profileCache = {}; // Cache for usernames
+  final Map<String, String> _profileCache = {}; 
 
   @override
   void initState() {
