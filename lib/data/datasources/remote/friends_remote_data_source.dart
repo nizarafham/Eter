@@ -1,7 +1,7 @@
 import 'package:chat_app/core/constants/supabase_constants.dart';
 import 'package:chat_app/data/models/friendship_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:rxdart/rxdart.dart';
+// import 'package:rxdart/rxdart.dart';
 
 abstract class FriendsRemoteDataSource {
   Stream<List<FriendshipModel>> getFriends(String userId);

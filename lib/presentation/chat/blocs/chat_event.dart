@@ -1,5 +1,4 @@
-part of 'chat_Event.dart';
-
+part of 'chat_bloc.dart';
 
 abstract class ChatEvent extends Equatable {
   const ChatEvent();
@@ -37,7 +36,6 @@ class DeleteMessageEvent extends ChatEvent {
   List<Object> get props => [messageId];
 }
 
-// Internal event triggered by the stream subscription
 class _MessagesUpdatedEvent extends ChatEvent {
   final List<MessageModel> messages;
 

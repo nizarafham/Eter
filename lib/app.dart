@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/screens/splash_screen.dart';
 
 class ChatApp extends StatelessWidget {
   const ChatApp({super.key});
@@ -20,7 +19,7 @@ class ChatApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashScreen(), // Start with a splash screen
+      home: const (), // Start with a splash screen
     );
   }
 }

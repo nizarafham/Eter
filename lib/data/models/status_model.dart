@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:chat_app/data/models/user_model.dart'; // For sender details
 
-enum StatusType { text, image, video } // Assuming video might be a future addition
+enum StatusType { text, image, video }
 
 class StatusModel extends Equatable {
   final String id;
@@ -59,6 +59,36 @@ class StatusModel extends Equatable {
       'expires_at': expiresAt.toIso8601String(),
       // 'viewed_by': viewedBy, // viewed_by is likely updated via a separate mechanism or RPC
     };
+  }
+
+  // ADDED copyWith method:
+  StatusModel copyWith({
+    String? id,
+    String? userId,
+    StatusType? type,
+    String? textContent,
+    // Use Object() to differentiate between explicitly setting to null vs. not providing a value
+    Object? mediaUrl = const Object(),
+    Object? thumbnailUrl = const Object(),
+    Object? backgroundColor = const Object(),
+    DateTime? createdAt,
+    DateTime? expiresAt,
+    List<String>? viewedBy,
+    Object? userDetails = const Object(),
+  }) {
+    return StatusModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      type: type ?? this.type,
+      textContent: textContent ?? this.textContent,
+      mediaUrl: mediaUrl == const Object() ? this.mediaUrl : mediaUrl as String?,
+      thumbnailUrl: thumbnailUrl == const Object() ? this.thumbnailUrl : thumbnailUrl as String?,
+      backgroundColor: backgroundColor == const Object() ? this.backgroundColor : backgroundColor as String?,
+      createdAt: createdAt ?? this.createdAt,
+      expiresAt: expiresAt ?? this.expiresAt,
+      viewedBy: viewedBy ?? this.viewedBy,
+      userDetails: userDetails == const Object() ? this.userDetails : userDetails as UserModel?,
+    );
   }
 
   @override

@@ -1,3 +1,4 @@
+// lib/data/repositories/profile_repository_impl.dart
 import 'dart:io';
 import 'package:chat_app/core/constants/supabase_constants.dart';
 import 'package:chat_app/data/datasources/remote/profile_remote_data_source.dart';
@@ -7,8 +8,9 @@ import 'package:chat_app/data/repositories/profile_repository.dart'; // Interfac
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource _profileRemoteDataSource;
-  final StorageRemoteDataSource _storageRemoteDataSource; // For avatar uploads
+  final StorageRemoteDataSource _storageRemoteDataSource;
 
+  // Konstruktor menggunakan positional arguments
   ProfileRepositoryImpl(this._profileRemoteDataSource, this._storageRemoteDataSource);
 
   @override
@@ -16,7 +18,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       return await _profileRemoteDataSource.getUserProfile(userId);
     } catch (e) {
-      // print("ProfileRepository GetUserProfile Error: $e");
       rethrow;
     }
   }
@@ -27,14 +28,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
       String? avatarUrl;
       if (avatarImage != null) {
         final fileName = 'avatar_${userId}_${DateTime.now().millisecondsSinceEpoch}.${avatarImage.path.split('.').last}';
-        final filePath = '$userId/$fileName'; // Path in bucket
+        final filePath = '$userId/$fileName';
         avatarUrl = await _storageRemoteDataSource.uploadFile(
           avatarImage,
-          SupabaseConstants.profileAvatarsBucket, // Use a specific bucket for avatars
+          SupabaseConstants.profileAvatarsBucket,
           filePath,
         );
       }
-      // Create a map of updates, only including non-null values
       final updates = <String, dynamic>{};
       if (username != null) updates['username'] = username;
       if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
@@ -43,7 +43,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
         await _profileRemoteDataSource.updateUserProfileData(userId, updates);
       }
     } catch (e) {
-      // print("ProfileRepository UpdateUserProfile Error: $e");
       rethrow;
     }
   }
@@ -53,7 +52,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
      try {
       return await _profileRemoteDataSource.searchUsersByUsername(usernameQuery, limit: limit);
     } catch (e) {
-      // print("ProfileRepository SearchUsers Error: $e");
       rethrow;
     }
   }

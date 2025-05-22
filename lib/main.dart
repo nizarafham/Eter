@@ -1,56 +1,36 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart'; // Meskipun provider utama di app.dart, import ini mungkin masih berguna untuk SimpleBlocObserver
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:chat_app/core/di/service_locator.dart' as di;
-import 'package:chat_app/presentation/auth/blocs/auth_bloc.dart';
-import 'package:chat_app/presentation/screens/splash_screen.dart';
-import 'package:chat_app/core/theme/app_theme.dart';
-// import 'package:chat_app/presentation/blocs/simple_bloc_observer.dart'; // Optional: for BLoC logging
-
-// Supabase client instance
-late final SupabaseClient supabase;
+import 'package:chat_app/app.dart'; // Impor widget ChatApp dari app.dart
+import 'package:chat_app/core/di/service_locator.dart' as di; // Alias 'di' untuk service locator
 
 Future<void> main() async {
+  // Pastikan semua binding Flutter sudah siap sebelum menjalankan kode asinkron.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
+  // Muat environment variables dari file .env (misalnya untuk Supabase URL dan Key).
   await dotenv.load(fileName: ".env");
 
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
-  supabase = Supabase.instance.client;
-
-  // Initialize dependency injection
-  await di.init();
-
-  // Optional: Set up BLoC observer for debugging
-  Bloc.observer = SimpleBlocObserver();
-
-  runApp(const ChatApp());
-}
-
-class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(
-          create: (context) => di.sl<AuthBloc>()..add(AuthAppStarted()),
-        ),
-        // Add other global BLoCs here if needed, or provide them locally
-      ],
-      child: MaterialApp(
-        title: 'Eter Chat',
-        theme: AppTheme.darkTheme,
-        debugShowCheckedModeBanner: false,
-        home: const SplashScreen(),
-      ),
+  // Inisialisasi Supabase.
+  // Pastikan SUPABASE_URL dan SUPABASE_ANON_KEY ada di file .env Anda.
+  try {
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL']!,
+      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
     );
+  } catch (e) {
+    // Tangani error jika variabel env tidak ada atau inisialisasi gagal
+    // print("Error inisialisasi Supabase: $e");
+    // Anda mungkin ingin menampilkan pesan error atau keluar dari aplikasi.
+    // Untuk sekarang, kita biarkan berlanjut, tapi di produksi ini perlu penanganan.
   }
+
+
+  // Inisialisasi dependency injection (GetIt).
+  await di.init(); // Panggil fungsi init dari service_locator.dart
+
+  // Jalankan aplikasi utama.
+  runApp(const ChatApp()); // Jalankan widget ChatApp dari app.dart
 }

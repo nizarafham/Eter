@@ -1,48 +1,65 @@
 // lib/presentation/chat/pages/chat_screen.dart
 import 'dart:io';
 
+import 'package:chat_app/presentation/message_input/blocs/message_input_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart'; // Untuk memilih gambar
 import 'package:chat_app/data/models/message_model.dart'; // Pastikan path ini benar
+import 'package:chat_app/core/di/service_locator.dart';
 import 'package:chat_app/data/repositories/chat_repository.dart'; // Pastikan path ini benar
 import 'package:chat_app/presentation/chat/blocs/chat_bloc.dart'; // Pastikan path ini benar
 import 'package:chat_app/presentation/chat/widgets/message_bubble.dart'; // Import widget pembantu
 
 class ChatScreen extends StatelessWidget {
   final String conversationId;
-  final String currentUserId;
   final String otherUserName; // Nama pengguna lawan chat
-  final ChatRepository chatRepository; // Menerima repository sebagai dependensi
 
+  // Hapus chatRepository dan currentUserId dari konstruktor ChatScreen
   const ChatScreen({
-    Key? key,
+    super.key,
     required this.conversationId,
-    required this.currentUserId,
     required this.otherUserName,
-    required this.chatRepository,
-  }) : super(key: key);
+    // final ChatRepository chatRepository, // TIDAK PERLU LAGI
+    // final String currentUserId, // TIDAK PERLU LAGI
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ChatBloc(
-        chatRepository: chatRepository,
-        conversationId: conversationId,
-        currentUserId: currentUserId,
-      )..add(LoadMessagesEvent()), // Memuat pesan saat bloc dibuat
+    // Jika Anda perlu currentUserId untuk logika di luar BLoC di layar ini,
+    // Anda bisa mendapatkannya dari AuthBloc yang sudah global.
+    // final String? currentUserId = context.watch<AuthBloc>().state.user?.id;
+
+    return MultiBlocProvider( // Gunakan MultiBlocProvider jika Anda juga memakai MessageInputCubit di sini
+      providers: [
+        BlocProvider<ChatBloc>(
+          create: (context) => sl<ChatBloc>(param1: conversationId) // <- PERUBAHAN UTAMA DI SINI
+            ..add(LoadMessagesEvent()), // Memuat pesan saat bloc dibuat
+        ),
+        BlocProvider<MessageInputCubit>( // Tambahkan ini jika belum ada dan Anda ingin MessageInputCubit
+          create: (context) => sl<MessageInputCubit>(),
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: Text(otherUserName),
         ),
-        body: const _ChatBody(),
+        // Pastikan _ChatBody juga sudah disesuaikan untuk tidak bergantung pada
+        // currentUserId yang diteruskan dari ChatScreen, tapi dari AuthBloc atau ChatBloc.
+        // Dan pastikan _ChatBody menggunakan MessageInputCubit untuk mengirim pesan.
+        body: _ChatBody(conversationId: conversationId), // _ChatBody mungkin perlu conversationId
       ),
     );
   }
 }
 
 class _ChatBody extends StatefulWidget {
-  const _ChatBody({Key? key}) : super(key: key);
+  final String conversationId; // <<< TAMBAHKAN PARAMETER INI
+
+  const _ChatBody({
+    Key? key,
+    required this.conversationId, // <<< TAMBAHKAN PARAMETER INI KE KONSTRUKTOR
+  }) : super(key: key);
 
   @override
   State<_ChatBody> createState() => _ChatBodyState();

@@ -1,88 +1,100 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:chat_app/data/models/message_model.dart';
 import 'package:chat_app/data/repositories/chat_repository.dart';
+import 'package:chat_app/presentation/auth/blocs/auth_bloc.dart'; // Import AuthBloc
+import 'dart:io'; // Untuk SendImageMessageEvent
 
-part 'chat_event.dart';
-part 'chat_state.dart';
+part 'chat_Event.dart';
+part 'chat_state.dart'; // Pastikan chat_state.dart Anda memiliki definisi state yang sesuai
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository _chatRepository;
+  final AuthBloc _authBloc; // TAMBAHKAN INI
   final String conversationId;
-  final String currentUserId; // Needed to know who is sending
+  // HAPUS currentUserId dari parameter konstruktor jika menggunakan AuthBloc
+  // final String currentUserId;
+
+  // Getter untuk currentUserId dari AuthBloc
+  String get currentUserId => _authBloc.state.user!.id;
 
   StreamSubscription? _messagesSubscription;
 
   ChatBloc({
-    required ChatRepository chatRepository, // Corrected parameter name
+    required ChatRepository chatRepository,
+    required AuthBloc authBloc, // TAMBAHKAN INI
     required this.conversationId,
-    required this.currentUserId,
+    // required this.currentUserId, // HAPUS INI
   })  : _chatRepository = chatRepository,
-        super(ChatInitial()) {
+        _authBloc = authBloc, // Inisialisasi
+        super(ChatInitial()) { // Atau state awal yang sesuai
     on<LoadMessagesEvent>(_onLoadMessages);
+    on<_MessagesUpdatedEvent>(_onMessagesUpdated); // Event internal jika Anda menggunakannya
     on<SendTextMessageEvent>(_onSendTextMessage);
     on<SendImageMessageEvent>(_onSendImageMessage);
     on<DeleteMessageEvent>(_onDeleteMessage);
-    on<_MessagesUpdatedEvent>(_onMessagesUpdated);
   }
 
   void _onLoadMessages(LoadMessagesEvent event, Emitter<ChatState> emit) {
-    emit(ChatLoading());
-    _messagesSubscription?.cancel(); // Cancel previous subscription if any
+    // Asumsikan ChatLoading state memiliki currentMessages
+    List<MessageModel> previousMessages = [];
+    if (state is ChatMessagesLoaded) {
+        previousMessages = (state as ChatMessagesLoaded).messages;
+    } else if (state is ChatLoading) {
+        previousMessages = (state as ChatLoading).currentMessages;
+    }
+    emit(ChatLoading(currentMessages: previousMessages));
+
+    _messagesSubscription?.cancel();
     _messagesSubscription = _chatRepository.getMessages(conversationId).listen(
-      (messages) => add(_MessagesUpdatedEvent(messages)), // Add internal event on update
-      onError: (error) => emit(ChatError("Failed to load messages: $error")),
+      (messages) => add(_MessagesUpdatedEvent(messages)),
+      onError: (error) => emit(ChatError(
+          "Gagal memuat pesan: ${error.toString()}",
+          currentMessages: previousMessages
+      )),
     );
   }
 
   void _onMessagesUpdated(_MessagesUpdatedEvent event, Emitter<ChatState> emit) {
-    // Only emit ChatMessagesLoaded if the state isn't already ChatMessagesLoaded
-    // with the same messages to avoid unnecessary rebuilds.
-    if (state is ChatMessagesLoaded && (state as ChatMessagesLoaded).messages == event.messages) {
-      return;
-    }
     emit(ChatMessagesLoaded(event.messages));
   }
 
   Future<void> _onSendTextMessage(SendTextMessageEvent event, Emitter<ChatState> emit) async {
-    // Optional: emit(ChatMessageSending()); if you want explicit UI for sending
+    // State saat ini (untuk mempertahankan pesan yang sudah ada saat mengirim)
+    // MessageInputCubit yang akan menangani state 'sending' untuk UI input
     try {
+      // currentUserId sekarang didapat dari getter
       await _chatRepository.sendTextMessage(conversationId, event.text, currentUserId);
-      // The stream subscription will pick up the new message and emit _MessagesUpdatedEvent
-      // leading to ChatMessagesLoaded, so explicit ChatMessageSent is often not needed.
+      // Pesan akan terupdate melalui stream _messagesSubscription
     } catch (e) {
-      // Revert to previous state or just emit error
-      emit(ChatError("Failed to send message: ${e.toString()}"));
+      // emit(ChatError("Gagal mengirim pesan: ${e.toString()}", currentMessages: _getCurrentMessagesFromState()));
+      // Error pengiriman sebaiknya ditangani oleh MessageInputCubit jika ada
     }
   }
 
   Future<void> _onSendImageMessage(SendImageMessageEvent event, Emitter<ChatState> emit) async {
-    // Optional: emit(ChatMessageSending());
     try {
       await _chatRepository.sendImageMessage(conversationId, event.imageFile, currentUserId);
+      // Pesan akan terupdate melalui stream
     } catch (e) {
-      emit(ChatError("Failed to send image: ${e.toString()}"));
+      // emit(ChatError("Gagal mengirim gambar: ${e.toString()}", currentMessages: _getCurrentMessagesFromState()));
     }
   }
 
   Future<void> _onDeleteMessage(DeleteMessageEvent event, Emitter<ChatState> emit) async {
     try {
       await _chatRepository.deleteMessage(event.messageId);
-      // The stream will update, so the UI will reflect the deletion automatically.
-      // If you need immediate optimistic update, you could modify the current list
-      // in ChatMessagesLoaded state and emit a new state, then revert if deletion fails.
-      // For now, relying on the stream for eventual consistency.
+      // Pesan akan terupdate melalui stream
     } catch (e) {
-      emit(ChatError("Failed to delete message: ${e.toString()}"));
+      // emit(ChatError("Gagal menghapus pesan: ${e.toString()}", currentMessages: _getCurrentMessagesFromState()));
     }
   }
 
   @override
   Future<void> close() {
-    _messagesSubscription?.cancel(); // Cancel the stream subscription when the BLoC is closed
+    _messagesSubscription?.cancel();
     return super.close();
   }
 }
