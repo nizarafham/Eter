@@ -1,9 +1,22 @@
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthState, User; // Show only necessary types
+// auth_repository.dart
+import 'package:supabase_flutter/supabase_flutter.dart' show User, AuthState;
 
 abstract class AuthRepository {
-  Future<User?> signUp(String email, String password, String username);
-  Future<User?> signIn(String email, String password);
-  Future<void> signOut();
-  User? getCurrentUser();
+  User? get currentUser;
   Stream<AuthState> get authStateChanges;
+  
+  Future<void> signUp({
+    required String email,
+    required String password,
+    required String username,
+  });
+  
+  Future<void> signIn({
+    required String email,
+    required String password,
+  });
+  
+  Future<void> signOut();
+  Future<void> sendPasswordResetEmail(String email);
+  Future<void> sendEmailVerification();
 }

@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:chat_app/main.dart'; 
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/screens/auth_screen.dart';
-import 'package:chat_app/widgets/message_bubble.dart';
+import 'package:chat_app/presentation/chat/widgets/message_bubble.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});

@@ -1,3 +1,7 @@
+import 'package:chat_app/data/repositories/auth_repository.dart';
+import 'package:chat_app/data/repositories/chat_repository.dart';
+import 'package:chat_app/data/repositories/profile_repository.dart';
+import 'package:chat_app/data/repositories/storage_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:chat_app/data/datasources/remote/auth_remote_data_source.dart';
@@ -8,8 +12,8 @@ import 'package:chat_app/data/repositories/auth_repository_impl.dart';
 import 'package:chat_app/data/repositories/chat_repository_impl.dart';
 import 'package:chat_app/data/repositories/profile_repository_impl.dart';
 import 'package:chat_app/data/repositories/storage_repository_impl.dart';
-import 'package:chat_app/presentation/blocs/auth/auth_bloc.dart';
-import 'package:chat_app/presentation/blocs/chat/chat_bloc.dart';
+import 'package:chat_app/presentation/auth/blocs/auth_bloc.dart';
+import 'package:chat_app/presentation/chat/blocs/chat_bloc.dart';
 import 'package:chat_app/presentation/blocs/message_input/message_input_cubit.dart';
 import 'package:chat_app/presentation/blocs/profile/profile_cubit.dart';
 import 'package:chat_app/presentation/blocs/user_search/user_search_cubit.dart';

@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:chat_app/core/di/service_locator.dart' as di;
-import 'package:chat_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:chat_app/presentation/auth/blocs/auth_bloc.dart';
 import 'package:chat_app/presentation/screens/splash_screen.dart';
 import 'package:chat_app/core/theme/app_theme.dart';
-import 'package:chat_app/presentation/blocs/simple_bloc_observer.dart'; // Optional: for BLoC logging
+// import 'package:chat_app/presentation/blocs/simple_bloc_observer.dart'; // Optional: for BLoC logging
 
 // Supabase client instance
 late final SupabaseClient supabase;

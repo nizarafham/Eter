@@ -1,17 +1,17 @@
 import 'package:equatable/equatable.dart';
 
-enum MessageType { text, image, system } // System for "User A joined" etc.
+enum MessageType { text, image, system }
 
 class MessageModel extends Equatable {
   final String id;
-  final String conversationId; // ID of the DM chat or group chat
+  final String conversationId;
   final String senderId;
   final String? textContent;
   final String? imageUrl;
   final MessageType type;
   final DateTime createdAt;
-  final String? senderUsername; // Denormalized for easier display
-  final String? senderAvatarUrl; // Denormalized
+  final String? senderUsername;
+  final String? senderAvatarUrl;
 
   const MessageModel({
     required this.id,
@@ -25,6 +25,12 @@ class MessageModel extends Equatable {
     this.senderAvatarUrl,
   });
 
+  // Getter for content that works for both text and image messages
+  String get content => textContent ?? (type == MessageType.image ? 'Image' : 'System message');
+
+  // Getter for mediaUrl that safely returns the image URL
+  String? get mediaUrl => imageUrl;
+
   factory MessageModel.fromMap(Map<String, dynamic> map, {String? username, String? avatarUrl}) {
     MessageType messageType;
     if (map['image_url'] != null) {
@@ -32,8 +38,7 @@ class MessageModel extends Equatable {
     } else if (map['text_content'] != null) {
       messageType = MessageType.text;
     } else {
-      // Default or handle system messages if you have a 'type' column
-      messageType = MessageType.system; // Or throw error if unexpected
+      messageType = MessageType.system;
     }
 
     return MessageModel(
@@ -44,20 +49,19 @@ class MessageModel extends Equatable {
       imageUrl: map['image_url'] as String?,
       type: map['type'] != null ? MessageType.values.byName(map['type']) : messageType,
       createdAt: DateTime.parse(map['created_at'] as String),
-      senderUsername: username ?? map['sender_username'] as String?, // If joined
-      senderAvatarUrl: avatarUrl ?? map['sender_avatar_url'] as String?, // If joined
+      senderUsername: username ?? map['sender_username'] as String?,
+      senderAvatarUrl: avatarUrl ?? map['sender_avatar_url'] as String?,
     );
   }
 
-   Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap() {
     return {
-      'id': id, // Supabase usually handles ID generation
+      'id': id,
       'conversation_id': conversationId,
       'sender_id': senderId,
       'text_content': textContent,
       'image_url': imageUrl,
       'type': type.name,
-      // 'created_at': createdAt.toIso8601String(), // Supabase handles timestamp
     };
   }
 
