@@ -1,6 +1,7 @@
 import 'package:chat_app/data/repositories/supabase_auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 import 'data/repositories/auth_repository.dart';
@@ -24,10 +25,30 @@ import 'presentation/status/screens/create_status_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL',
-    anonKey: 'YOUR_SUPABASE_ANON_KEY',
-  );
+  await dotenv.load(fileName: ".env");
+
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+  if (supabaseUrl == null || supabaseUrl.isEmpty ||
+      supabaseAnonKey == null || supabaseAnonKey.isEmpty) {
+    // Di aplikasi produksi, tangani error ini dengan lebih baik.
+    // print("ERROR: SUPABASE_URL atau SUPABASE_ANON_KEY tidak ditemukan atau kosong di .env!");
+    // Mungkin throw exception atau tampilkan UI error.
+    throw Exception("SUPABASE_URL atau SUPABASE_ANON_KEY tidak valid di file .env");
+  }
+
+  // 2. Inisialisasi Supabase dengan nilai dari .env
+  try {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+  } catch (e) {
+    // print("Error inisialisasi Supabase: $e");
+    // Pertimbangkan untuk menampilkan pesan error kepada pengguna di sini.
+    return; // Hentikan aplikasi jika Supabase gagal diinisialisasi.
+  }
 
   final authRepository = SupabaseAuthRepository();
 

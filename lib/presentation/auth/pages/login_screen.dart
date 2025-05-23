@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SnackBar(content: Text('Berhasil masuk!')),
             );
             // Contoh navigasi ke halaman utama, sesuaikan dengan rute Anda
-            // Navigator.of(context).pushReplacementNamed('/home');
+            Navigator.of(context).pushReplacementNamed('/home');
             // Atau jika menggunakan Navigator 1.0:
             // Navigator.of(context).pushAndRemoveUntil(
             //   MaterialPageRoute(builder: (context) => const HomeScreen()), // Ganti dengan HomeScreen Anda
