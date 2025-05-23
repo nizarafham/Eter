@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         Navigator.of(dialogContext).pop(); // Tutup dialog
                         // Dispatch event logout ke AuthBloc
-                        context.read<AuthBloc>().add(AuthSignOutRequested());
+                        context.read<AuthBloc>().add(SignOutRequested());
                         // Listener AuthBloc di SplashScreen akan menangani navigasi ke AuthScreen
                         // Atau jika ingin langsung dari sini:
                         // Navigator.of(context).pushAndRemoveUntil(

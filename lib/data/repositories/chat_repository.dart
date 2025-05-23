@@ -9,5 +9,11 @@ abstract class ChatRepository {
   Future<void> deleteMessage(String messageId);
   Stream<List<ConversationModel>> getConversations(String userId);
   Future<String?> getOrCreateDmConversation(String userId1, String userId2); // Returns conversationId
-  // Add group chat methods if not in GroupRepository
+  Future<String?> createGroupConversation({
+    required String groupId, // Usually the same as conversationId for groups
+    required String groupName,
+    required List<String> memberIds,
+    String? groupAvatarUrl,
+    required String createdBy, // User ID of the group creator
+  });
 }

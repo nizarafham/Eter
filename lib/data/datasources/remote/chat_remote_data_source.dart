@@ -15,7 +15,13 @@ abstract class ChatRemoteDataSource {
   Stream<List<ConversationModel>> getConversations(String userId);
   // Implementation for getOrCreateDmConversation
   Future<String?> getOrCreateDmConversation(String userId1, String userId2);
-  // Add methods for conversations/groups (createGroup, getConversations, etc.)
+  Future<String?> createGroupConversation({
+    required String groupId,
+    required String groupName,
+    required List<String> memberIds,
+    String? groupAvatarUrl,
+    required String createdBy,
+  });
 }
 
 class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
@@ -143,5 +149,11 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
           });
       return newConversationId;
     }
+  }
+  
+  @override
+  Future<String?> createGroupConversation({required String groupId, required String groupName, required List<String> memberIds, String? groupAvatarUrl, required String createdBy}) {
+    // TODO: implement createGroupConversation
+    throw UnimplementedError();
   }
 }

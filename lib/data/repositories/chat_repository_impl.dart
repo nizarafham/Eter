@@ -12,6 +12,29 @@ class ChatRepositoryImpl implements ChatRepository {
   ChatRepositoryImpl(this._remoteDataSource);
 
   @override
+  Future<String?> createGroupConversation({
+    required String groupId,
+    required String groupName,
+    required List<String> memberIds,
+    String? groupAvatarUrl,
+    required String createdBy,
+  }) async {
+    try {
+      // ChatRemoteDataSource sekarang perlu metode ini juga
+      return await _remoteDataSource.createGroupConversation(
+        groupId: groupId,
+        groupName: groupName,
+        memberIds: memberIds,
+        groupAvatarUrl: groupAvatarUrl,
+        createdBy: createdBy,
+      );
+    } catch (e) {
+      // print("ChatRepositoryImpl createGroupConversation error: $e");
+      rethrow;
+    }
+  }
+  
+  @override
   Stream<List<MessageModel>> getMessages(String conversationId) {
     return _remoteDataSource.getMessages(conversationId);
   }

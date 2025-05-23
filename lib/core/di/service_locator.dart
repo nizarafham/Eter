@@ -1,3 +1,4 @@
+import 'package:chat_app/presentation/conversations/blocs/conversations_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -73,7 +74,7 @@ Future<void> init() async {
   sl.registerLazySingleton<StatusRemoteDataSource>(
       () => StatusRemoteDataSourceImpl(sl<SupabaseClient>()));
   // sl.registerLazySingleton<GroupRemoteDataSource>(() => GroupRemoteDataSourceImpl(sl<SupabaseClient>()));
-
+  sl.registerLazySingleton<ProfileRepository>(() => ProfileRepositoryImpl(sl<ProfileRemoteDataSource>(), sl<StorageRemoteDataSource>())); 
 
   // --- Repositories ---
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -133,11 +134,12 @@ Future<void> init() async {
         currentUserId: currentUserId!,
       ));
 
-  // // ConversationsBloc dikomentari karena belum ada
-  // sl.registerFactoryParam<ConversationsBloc, String, void>((currentUserId, _) => ConversationsBloc(
-  //       chatRepository: sl<ChatRepository>(),
-  //       currentUserId: currentUserId!,
-  //     ));
+
+ sl.registerFactoryParam<ConversationsBloc, String, void>((currentUserId, _) => ConversationsBloc(
+      chatRepository: sl<ChatRepository>(),
+      profileRepository: sl<ProfileRepository>(), // Tambahkan ini jika EnsureDmConversation menggunakan ProfileRepository
+      currentUserId: currentUserId!,
+    ));
 
   sl.registerFactoryParam<NotificationsBloc, String, void>((currentUserId, _) => NotificationsBloc(
         notificationRepository: sl<NotificationRepository>(),

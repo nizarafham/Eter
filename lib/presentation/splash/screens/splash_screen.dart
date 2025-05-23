@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chat_app/presentation/auth/blocs/auth_bloc.dart';
 // Ganti LoginScreen dengan AuthScreen jika Anda memiliki satu layar utama untuk autentikasi
 import 'package:chat_app/presentation/auth/pages/login_screen.dart'; // atau .../screens/auth_screen.dart
-import 'package:chat_app/presentation/home/screens/chat_screen.dart'; // Layar utama setelah login
+import 'package:chat_app/presentation/home/screens/home_screen.dart'; // Layar utama setelah login
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
